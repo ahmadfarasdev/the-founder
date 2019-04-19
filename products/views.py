@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Product, UserVote
+from .models import Product, UserVote, Comment
+from .forms import CommentForm
 from django.utils import timezone
 from django.core.mail import EmailMessage
 
@@ -33,7 +34,15 @@ def create(request):
 
 def detail(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
-    return render(request, 'products/detail.html', {'product': product})
+    comments = product.comments.all().order_by('id')
+
+    form = CommentForm()
+
+    return render(request, 'products/detail.html', {
+        'product': product,
+        'form': form,
+        'comments': comments
+    })
 
 @login_required(login_url='/accounts/signup')
 def upvote(request, product_id):
@@ -56,5 +65,21 @@ def upvote(request, product_id):
 
             email.content_subtype = "html"  # Main content is now text/html
             email.send()
+
+        return redirect('/products/' + str(product.id))
+
+@login_required(login_url='/accounts/signup')
+def comment(request, product_id):
+    if request.method == 'POST':
+        product = get_object_or_404(Product, pk=product_id)
+
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            Comment.objects.create(
+                product=product,
+                user=request.user,
+                message=form.cleaned_data['message']
+            )
 
         return redirect('/products/' + str(product.id))

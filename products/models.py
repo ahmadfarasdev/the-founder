@@ -28,5 +28,10 @@ class UserVote(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
 
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name="comments", on_delete=models.CASCADE)
+    message = models.TextField()
 
+    
 # default='http://127.0.0.1:8000/media/images/boxed-water-is-better-1464023-unsplash_Xvyfo9M.jpg'

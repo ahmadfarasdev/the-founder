@@ -35,9 +35,41 @@
   </div>
 </div>
 
+
+{% if comments %}
+    <br>
+    <h2>Comments</h2>
+    {% for comment in comments  %}
+        <div class="col-8">
+             <p>{{ comment.message }}</p>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if user.is_authenticated %}
+<br>
+<h2>Create new comment</h2>
+    <form class="" action="{% url 'post_comment' product.id  %}" enctype="multipart/form-data" method="POST">
+        {% csrf_token %}
+
+
+        {{ form.message.errors }}
+        <br>
+        {{ form.message.label_tag }}
+        <br>
+        {{ form.message }}
+        <br>
+
+        <input class="btn btn-primary" type="submit" name="" value="Post Comment">
+    </form>
+{% endif %}
+
 <form id="upvote" method="POST" action="{% url 'upvote' product.id %}">
   {% csrf_token %}
+
   <input type="hidden">
 </form>
+
+
 
 {% endblock content %}
